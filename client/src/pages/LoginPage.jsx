@@ -2,7 +2,7 @@ import axios from "axios";
 import { useContext } from "react";
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { UserContext } from "../UserContext";
+import { UserContext } from "../UserContext.jsx";
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -21,12 +21,10 @@ export default function LoginPage() {
             alert('login Failed');
         }
 
-        if (redirect) {
-            return <Navigate to={'/'} />
-        }
 
-
-
+    }
+    if (redirect) {
+        return <Navigate to={'/'} />
     }
     return (
         <div className="mt-4 grow flex items-center justify-around">
