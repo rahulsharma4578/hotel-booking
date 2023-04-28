@@ -35,7 +35,7 @@ app.post('/register', async (req, res) => {
         const userDoc = await User.create({
             name,
             email,
-            password: bcrypt.hashSync(password, bcryptSalt),
+            password:bcrypt.hashSync(password, bcryptSalt),
         });
 
         res.json(userDoc);
@@ -48,16 +48,16 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     
     const { email, password } = req.body;
-    const user1 = await User.findOne({ email });
-    if (user1) {
-        const passOk = bcrypt.compareSync(password, user1.password);
+    const userDoc = await User.findOne({ email });
+    if (userDoc) {
+        const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
             jwt.sign({
-                email: user1.email,
-                id: user1._id
+                email: userDoc.email,
+                id: userDoc._id
             }, jwtSecret, {}, (err, token) => {
                 if (err) throw err;
-                res.cookie('token', token).json(user1);
+                res.cookie('token', token).json(userDoc);
             });
         } else {
             res.status(422).json('pass not ok');
