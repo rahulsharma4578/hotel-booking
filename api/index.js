@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User.js');
+const Place = require('./models/Place.js');
 const cookieParser = require('cookie-parser');
 const imageDownloader = require('image-downloader');
 const multer = require('multer'); // this package is used for uploading of photo from device purpose.
@@ -23,7 +24,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(cors({
     credentials: true,
-    origin: 'http://127.0.0.1:5173',
+    origin : 'http://127.0.0.1:5173',
 }));
 //http://127.0.0.1:5173
 
@@ -112,22 +113,46 @@ app.post('/upload-by-link', async (req, res) => {
 const photosMiddleware = multer({ dest: 'uploads/' });
 app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
     const uploadedFiles = [];
-    for(let i=0;i< req.files.length;i++) {
-        const {path,originalname} = req.files[i];
+    for (let i = 0; i < req.files.length; i++) {
+        const { path, originalname } = req.files[i];
         const parts = originalname.split('.');
-        const ext = parts[parts.length-1];
+        const ext = parts[parts.length - 1];
         const newPath = path + '.' + ext;
-        fs.renameSync(path,newPath);
-        uploadedFiles.push(newPath.replace('uploads/',''));
+        fs.renameSync(path, newPath);
+        uploadedFiles.push(newPath.replace('uploads/', ''));
 
-        
-       
+
+
     }
     res.json(uploadedFiles);
 
 })
 
 app.listen(4000);
+
+app.post('/places', (req, res) => {
+    mongoose.connect(process.env.MONGO_URL);
+    const { token } = req.cookies;
+    const {
+        title, address, addedPhotos, description,
+        perks, extraInfo, checkIn, checkOut, maxGuests,
+    } = req.body;
+    jwt.verify( token , jwtSecret, {}, async (err, userData) => {
+        if (err) throw err;
+        const placeDoc = await Place.create({
+            owner: userData.id,
+            title, address, addedPhotos, description,
+            perks, extraInfo, checkIn, checkOut, maxGuests,
+
+
+        });
+        res.json(placeDoc);
+
+
+    });
+
+
+});
 
 
 

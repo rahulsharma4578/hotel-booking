@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose =require('mongoose');
+const {Schema} = mongoose;
 
 const placeSchema = new mongoose.Schema({
   owner: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
